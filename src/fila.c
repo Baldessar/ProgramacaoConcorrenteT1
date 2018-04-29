@@ -65,5 +65,9 @@ void inserir (fila_ordenada_t * fila, aviao_t * dado) {
 }
 
 aviao_t * remover (fila_ordenada_t * fila) {
-  return NULL;
+    elemento_t* remover = fila-> primeiro;
+    fila->primeiro = remover->anterior;
+    aviao_t aviao = remover->dado;
+    free(remover);
+    return aviao;
 }
