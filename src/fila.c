@@ -42,7 +42,8 @@ void inserir (fila_ordenada_t * fila, aviao_t * dado) {
     if (fila->n_elementos == 0)
     {
         elemento->proximo = elemento;
-        elemento->anterior = elemento; 
+        elemento->anterior = elemento;
+        pthread_mutex_unlock(&elemento->dado->mutexAviao); 
         fila->primeiro = elemento;
         fila->ultimo = elemento;
         fila->n_elementos = 1;
@@ -66,7 +67,19 @@ void inserir (fila_ordenada_t * fila, aviao_t * dado) {
 
 aviao_t * remover (fila_ordenada_t * fila) {
     elemento_t* remover = fila-> primeiro;
-    fila->primeiro = remover->anterior;
+    if (remover->anterior == remover)
+    {
+    	fila->primeiro = NULL;
+    	fila->ultimo = NULL;
+    	fila->n_elementos--;
+
+    } else {
+    	
+        fila->primeiro = remover->anterior;
+        fila->primeiro->proximo = remover->proximo;
+        pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
+    }
+    fila->n_elementos--;
     aviao_t aviao = remover->dado;
     free(remover);
     return aviao;

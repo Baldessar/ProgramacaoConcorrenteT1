@@ -8,7 +8,7 @@
  * Preencha a fila com elemento_t que contém os aviões apontado para o
  * anterior e o próximo. Use estes ponteiros para ordenar a fila a cada
  * insercão
- **/
+ **/			
 typedef struct elemento_t {
   struct elemento_t * anterior;
   struct elemento_t * proximo;
