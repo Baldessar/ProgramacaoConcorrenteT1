@@ -71,8 +71,6 @@ aviao_t * remover (fila_ordenada_t * fila) {
     {
     	fila->primeiro = NULL;
     	fila->ultimo = NULL;
-    	fila->n_elementos--;
-
     } else {
     	
         fila->primeiro = remover->anterior;
