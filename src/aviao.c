@@ -7,11 +7,13 @@
  * Descrições em aviao.h
  **/
 int id = 0;
-aviao_t * aloca_aviao (size_t combustivel, size_t id) {
-  aviao_t aviao = (struct aviao_t*) malloc (sizeof(aviao_t));
+aviao_t * aloca_aviao () {
+  aviao_t* aviao = (struct aviao_t*) malloc (sizeof(aviao_t));
   aviao->combustivel = (rand() % 100)+1;
   aviao->id = ++i;
-  aviao->thread = NULL;
+  pthread_mutex_init(&aviao->mutexAviao, NULL);
+  pthread_mutex_lock(&aviao->mutexAviao);
+  //pthread_create(aviao->thread, NULL, aproximar, parametros_aviao);
   return aviao;
 }
 
