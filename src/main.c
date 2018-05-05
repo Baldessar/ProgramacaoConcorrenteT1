@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "aeroporto.h"
+#include "aviao.h"
 
 #define NOVO_AVIAO_MIN 30
 #define NOVO_AVIAO_MAX 120
@@ -15,14 +16,6 @@
 #define TEMPO_SIMULACAO 10000
 
 int main (int argc, char** argv) {
-
-    //parameter struct
-    typedef struct
-    {
-        aeroporto_t aeroporto;
-        aviao_t aviao;
-        
-    }parametros_aviao;
 
     // Variáveis temporais (inicio t_)
     size_t t_novo_aviao_min, t_novo_aviao_max;
@@ -109,11 +102,11 @@ int main (int argc, char** argv) {
     {
         if (chegadaAviao == proxAviao);
         {   int combustivel = ((rand() % (COMBUSTIVEL_MAX - COMBUSTIVEL_MIN)) + COMBUSTIVEL_MIN);
-            aviao_t novoAviao = aloca_aviao(combustivel,i);
+            aviao_t* novoAviao = aloca_aviao(combustivel,i);
             parametros_aviao* params = (parametros_aviao*) malloc(sizeof(parametros_aviao));
             params->aviao = novoAviao;
             params->aeroporto = meu_aeroporto;
-            pthread_create(aviao->thread, NULL, aproximacao_aeroporto, params);
+            pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
             chegadaAviao = 0;
             proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
             

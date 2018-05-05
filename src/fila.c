@@ -1,4 +1,5 @@
 #include "fila.h"
+#include <stdlib.h>
 
 /**
  * fila.c
@@ -22,7 +23,7 @@
  }
 
 fila_ordenada_t * criar_fila () {
-    fila_ordenada_t fila = (fila_ordenada_t*) malloc(sizeof(fila_ordenada_t));
+    fila_ordenada_t* fila = (fila_ordenada_t*) malloc(sizeof(fila_ordenada_t));
 
     fila->primeiro = NULL;
     fila->ultimo = NULL;
@@ -59,26 +60,26 @@ void inserir (fila_ordenada_t * fila, aviao_t * dado) {
             elemento->anterior = fila->primeiro;
             fila->primeiro->proximo = elemento;
             fila->ultimo->anterior = elemento;
-            fila->ultimo = elemento->
+            fila->ultimo = elemento;
     	}
         fila->n_elementos++;
     }
 }
 
 aviao_t * remover (fila_ordenada_t * fila) {
-    elemento_t* remover = fila-> primeiro;
-    if (remover->anterior == remover)
+    elemento_t* removido = fila-> primeiro;
+    if (removido->anterior == removido)
     {
     	fila->primeiro = NULL;
     	fila->ultimo = NULL;
     } else {
     	
-        fila->primeiro = remover->anterior;
-        fila->primeiro->proximo = remover->proximo;
+        fila->primeiro = removido->anterior;
+        fila->primeiro->proximo = removido->proximo;
         pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
     }
     fila->n_elementos--;
-    aviao_t aviao = remover->dado;
-    free(remover);
+    aviao_t* aviao = removido->dado;
+    //free(remover);
     return aviao;
 }
