@@ -36,53 +36,52 @@ aeroporto_t* iniciar_aeroporto (size_t* args, size_t n_args) {
 
 }
 
-void aproximacao_aeroporto (void* args) {
+void aproximacao_aeroporto (aeroporto_t* aeroporto, aviao_t* aviao) {
 
-    inserir(args->aeroporto->fila_pista,args->aviao);
+    inserir(aeroporto->fila_pista,aviao);
     pthread_mutex_lock(&args->aviao->mutexAviao);
-    pthread_create(args->aviao->thread, NULL, pousar_aviao, args);
+    pousar_aviao(aeroporto,aviao);
 }
 
-void pousar_aviao (void* args) {
-    sem_wait(args->aeroporto->sem_pistas);
+void pousar_aviao (aeroporto_t* aeroporto, aviao_t* aviao) {
+    sem_wait(aeroporto->sem_pistas);
     aviao_t aviao_pousar = remover(args->aeroporto->fila_pista);
     aviao_pousar->combustivel = 100;
     usleep(TEMPO_POUSO_DECOLAGEM);
-    inserir(args->aeroporto->fila_portao,aviao_pousar);
-    sem_post(args->aeroporto->sem_pistas);
-    pthread_create(args->aviao->thread, NULL, acoplar_portao, args);
+    inserir(aeroporto->fila_portao,aviao_pousar);
+    sem_post(aeroporto->sem_pistas);
+    acoplar_portao(aeroporto,aviao);
 }
 
-void acoplar_portao (void* args) {
-    sem_wait(args->aeroporto->sem_portoes);
-    aviao_t aviao_portao = remover(args->aeroporto->fila_portao);
-    inserir(args->aeroporto->fila_portao,aviao_portao);
-    sem_post(args->aeroporto->sem_portoes);
-    pthread_create(args->aviao->thread, NULL, acoplar_portao, args);
+void acoplar_portao (aeroporto_t* aeroporto, aviao_t* aviao) {
+    sem_wait(aeroporto->sem_portoes);
+    aviao_t aviao_portao = remover(aeroporto->fila_portao);
+    inserir(aeroporto->fila_portao,aviao_portao);
+    sem_post(aeroporto->sem_portoes);
+    transportar_bagagens(aeroporto,aviao);
 }
 
-void transportar_bagagens (void* args) {
-    sem_wait(args_>aeroporto->sem_esteiras);
-    aviao_t aviao_bagagem = remover(args->aeroporto->fila_portao);
+void transportar_bagagens (aeroporto_t* aeroporto, aviao_t* aviao) {
+    sem_wait(aeroporto->sem_esteiras);
+    aviao_t aviao_bagagem = remover(aeroporto->fila_portao);
     usleep(TEMPO_REMOVER_BAGAGENS);
     usleep(TEMPO_INSERIR_BAGAGENS);
-    pthread_create(args->aviao->thread, NULL, acoplar_portao, args);
+    adicionar_bagagens_esteira(aeroporto,aviao);
 }
 
-void adicionar_bagagens_esteira (void* args) {
+void adicionar_bagagens_esteira (aeroporto_t* aeroporto, aviao_t* aviao) {
     usleep(TEMPO_BAGAGENS_ESTEIRA);
-    inserir(args->aeroporto->fila_pista,args->aviao);
-    sem_post(args_>aeroporto->sem_esteiras)
-    pthread_create(args->aviao->thread, NULL, acoplar_portao, args);   
+    inserir(aeroporto->fila_pista,args->aviao);
+    sem_post(aeroporto->sem_esteiras)
+    decolar_aviao(aeroporto,aviao);  
 }
 
-void decolar_aviao (void* args) {
-    sem_wait(args->aeroporto->sem_pistas);
-    aviao_t aviao_decolar = remover(args->aeroporto->fila_pista);
+void decolar_aviao (aeroporto_t* aeroporto, aviao_t* aviao) {
+    sem_wait(aeroporto->sem_pistas);
+    aviao_t aviao_decolar = remover(aeroporto->fila_pista);
     usleep(TEMPO_POUSO_DECOLAGEM);
-    sem_post(args->aeroporto->sem_pistas);
-    free(args->aviao);
-    free(args);
+    sem_post(aeroporto->sem_pistas);
+    free(aviao);
 }
 
 int finalizar_aeroporto (aeroporto_t* aeroporto) {
