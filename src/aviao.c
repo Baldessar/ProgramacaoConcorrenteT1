@@ -1,7 +1,7 @@
 #include "aviao.h"
 #include <stdlib.h>
 #include <time.h>
-#include "aeroporto.c"
+#include "aeroporto.h"
 
 
 
@@ -26,7 +26,7 @@ void desaloca_aviao(aviao_t* aviao) {
   free(aviao);
 }
 
-void inicia_aproximacao(void* args) {
+void* inicia_aproximacao(void* args) {
 	parametros_aviao* parametros = (parametros_aviao*)args;
 	aproximacao_aeroporto(parametros->aeroporto, parametros->aviao);
 	free(args);

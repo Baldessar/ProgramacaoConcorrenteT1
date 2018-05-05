@@ -97,21 +97,26 @@ int main (int argc, char** argv) {
     // Lembre-se de implementá-las num novo arquivo "aeroporto.c"
     srand(clock());
     int proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
-    int chegadaAviao;
+    int chegadaAviao = 0;
     for (int i = 0; i < TEMPO_SIMULACAO; ++i)
-    {
-        if (chegadaAviao == proxAviao);
+    {       
+        // printf("%d\n",i);
+        // printf("chegadaAviao: %d\n",chegadaAviao);
+        // printf("proxAviao: %d\n",proxAviao);
+        if (chegadaAviao == proxAviao)
         {   int combustivel = ((rand() % (COMBUSTIVEL_MAX - COMBUSTIVEL_MIN)) + COMBUSTIVEL_MIN);
             aviao_t* novoAviao = aloca_aviao(combustivel,i);
             parametros_aviao* params = (parametros_aviao*) malloc(sizeof(parametros_aviao));
             params->aviao = novoAviao;
             params->aeroporto = meu_aeroporto;
-            pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
+            //pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
+            pthread_create(&novoAviao->thread, NULL, inicia_aproximacao, (void *)params);
             chegadaAviao = 0;
             proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
-            
+            printf("AAAAAAAAAAAAAAAAAAAAAAAAAaaa\n");
         }
         chegadaAviao++;
+
     }
 
     finalizar_aeroporto(meu_aeroporto);
