@@ -83,7 +83,6 @@ int main (int argc, char** argv) {
     printf("Tempo de inserção (%lu) e remoção (%lu) de bagagens\n", t_inserir_bagagens, t_remover_bagagens);
     printf("Número de esteiras: %lu, com %lu aviões por esteira\n", n_esteiras, n_max_avioes_esteira);
     printf("Tempo das bagagens nas esteiras: %lu\n", t_bagagens_esteira);
-
     // Inicialização do aeroporto
     n_args = 8;
     size_t args[8] = {n_pistas, n_portoes, n_esteiras,
@@ -98,27 +97,34 @@ int main (int argc, char** argv) {
     srand(clock());
     int proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
     int chegadaAviao = 0;
+    int idaviao = 0;
+    pthread_t* threads[TEMPO_SIMULACAO/NOVO_AVIAO_MIN];
+
     for (int i = 0; i < TEMPO_SIMULACAO; ++i)
     {       
         // printf("%d\n",i);
         // printf("chegadaAviao: %d\n",chegadaAviao);
         // printf("proxAviao: %d\n",proxAviao);
         if (chegadaAviao == proxAviao)
-        {   int combustivel = ((rand() % (COMBUSTIVEL_MAX - COMBUSTIVEL_MIN)) + COMBUSTIVEL_MIN);
-            aviao_t* novoAviao = aloca_aviao(combustivel,i);
+        {   idaviao++;
+            int combustivel = ((rand() % (COMBUSTIVEL_MAX - COMBUSTIVEL_MIN)) + COMBUSTIVEL_MIN);
+            aviao_t* novoAviao = aloca_aviao(combustivel,idaviao);
+            //printf("aviaum %d \n",&novoAviao );
             parametros_aviao* params = (parametros_aviao*) malloc(sizeof(parametros_aviao));
             params->aviao = novoAviao;
             params->aeroporto = meu_aeroporto;
             //pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
+            inserir(meu_aeroporto->fila_pista, novoAviao);
             pthread_create(&novoAviao->thread, NULL, inicia_aproximacao, (void *)params);
             chegadaAviao = 0;
             proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
-            printf("AAAAAAAAAAAAAAAAAAAAAAAAAaaa\n");
+            //threads[idaviao] = &novoAviao->thread;
         }
         chegadaAviao++;
-
     }
-
-    finalizar_aeroporto(meu_aeroporto);
+    printf("KARALHO: %lu\n", idaviao);
+    for(int i=0; i < idaviao-1; i++) {
+        pthread_join(*threads[i], NULL);
+    }
     return 1;
 }

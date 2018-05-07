@@ -17,7 +17,9 @@ aviao_t* aloca_aviao (size_t combustivel, size_t id) {
   aviao->combustivel = combustivel;
   aviao->id = id;
   pthread_mutex_init(&aviao->mutexAviao, NULL);
+  //printf("antes: %d\n",aviao->mutexAviao);
   pthread_mutex_lock(&aviao->mutexAviao);
+  //printf("depois: %d\n",aviao->mutexAviao);
   //pthread_create(aviao->thread, NULL, aproximar, parametros_aviao);
   return aviao;
 }

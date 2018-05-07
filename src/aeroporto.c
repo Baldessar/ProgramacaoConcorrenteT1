@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "aeroporto.h"
 #include "semaphore.h"
-
 /**
  * aeroporto.c
  * Implementação das funções do aeroporto.h
@@ -14,35 +13,23 @@ aeroporto_t* iniciar_aeroporto (size_t* args, size_t n_args) {
     aeroporto->sem_pistas =(sem_t*) malloc(sizeof(sem_t));
     aeroporto->sem_portoes =(sem_t*) malloc(sizeof(sem_t));
     aeroporto->sem_esteiras =(sem_t*) malloc(sizeof(sem_t));
-    printf("1\n");
-    aeroporto->n_pistas = args[1];
-    printf("2\n");
-    aeroporto->n_portoes = args[2];
-    printf("3\n");
-    aeroporto->n_esteiras = args[3];
-    printf("4\n");
-    aeroporto->n_max_avioes_esteira = args[4];
-    printf("5\n");
-    aeroporto->t_pouso_decolagem = args[5];
-    printf("6\n");
-    aeroporto->t_remover_bagagens = args[6];
-    printf("7\n");
-    aeroporto->t_inserir_bagagens = args[7];
-    printf("8\n");
-    aeroporto->t_bagagens_esteira = args[8];
-    printf("9\n");
+    aeroporto->n_pistas = args[0];
+    aeroporto->n_portoes = args[1];
+    aeroporto->n_esteiras = args[2];
+    aeroporto->n_max_avioes_esteira = args[3];
+    aeroporto->t_pouso_decolagem = args[4];
+    aeroporto->t_remover_bagagens = args[5];
+    aeroporto->t_inserir_bagagens = args[6];
+    aeroporto->t_bagagens_esteira = args[7];
     aeroporto->fila_pista = criar_fila();
-    printf("10\n");
     aeroporto->fila_portao = criar_fila();
-    printf("11\n");
     aeroporto->fila_esteira = criar_fila();
-    printf("12\n");
+    aeroporto->fila_pista->nome_fila = "Pista: ";
+    aeroporto->fila_portao->nome_fila = "Portoes: ";
+    aeroporto->fila_esteira->nome_fila = "Esteiras: ";
     sem_init(aeroporto->sem_pistas, 0, aeroporto->n_pistas);
-    printf("13\n");
     sem_init(aeroporto->sem_portoes, 0, aeroporto->n_portoes);
-    printf("14\n");
     sem_init(aeroporto->sem_esteiras, 0, (aeroporto->n_esteiras * aeroporto->n_max_avioes_esteira));
-    printf("fim\n");
     return aeroporto;
 
 }
@@ -50,30 +37,59 @@ aeroporto_t* iniciar_aeroporto (size_t* args, size_t n_args) {
 
 
 void aproximacao_aeroporto (aeroporto_t* aeroporto, aviao_t* aviao) {
-
-    inserir(aeroporto->fila_pista,aviao);
+    printf("Aviao %d se aproximando\n",aviao->id);
     pthread_mutex_lock(&aviao->mutexAviao);
+    sem_wait(aeroporto->sem_pistas);
+    printf("Aviao %d liberado para pouso\n",aviao->id);
     pousar_aviao(aeroporto,aviao);
 }
 
 void pousar_aviao (aeroporto_t* aeroporto, aviao_t* aviao) {
-    
+    printf("Aviao %d pousando\n",aviao->id);
+    usleep(aeroporto->t_pouso_decolagem);
+    remover(aeroporto->fila_pista);
+    inserir(aeroporto->fila_portao,aviao);
+    sem_post(aeroporto->sem_pistas);
+    pthread_mutex_lock(&aviao->mutexAviao);
+    sem_wait(aeroporto->sem_portoes);
+    printf("Aviao %d liberado engate no portao\n",aviao->id);
+    acoplar_portao(aeroporto,aviao);
 }
 
 void acoplar_portao (aeroporto_t* aeroporto, aviao_t* aviao) {
-    
+    printf("Aviao %d acoplado no portao\n",aviao->id);
+    remover(aeroporto->fila_portao);
+    inserir(aeroporto->fila_esteira,aviao);
+    sem_post(aeroporto->sem_portoes);
+    pthread_mutex_lock(&aviao->mutexAviao);
+    sem_wait(aeroporto->sem_esteiras);
+    printf("Aviao %d liberado uso das esteiras\n",aviao->id);
+    transportar_bagagens(aeroporto,aviao);
 }
 
 void transportar_bagagens (aeroporto_t* aeroporto, aviao_t* aviao) {
-    
+    printf("Aviao %d transportando bagagens para as esteiras\n",aviao->id);
+    usleep(aeroporto->t_remover_bagagens);
+    adicionar_bagagens_esteira(aeroporto,aviao);
 }
 
 void adicionar_bagagens_esteira (aeroporto_t* aeroporto, aviao_t* aviao) {
-    
+    printf("Aviao %d adicionando bagagens as esteiras\n",aviao->id);
+    remover(aeroporto->fila_esteira);
+    usleep(aeroporto->t_inserir_bagagens + aeroporto->t_bagagens_esteira);
+    sem_post(aeroporto->sem_esteiras);
+    decolar_aviao(aeroporto,aviao);
 }
 
 void decolar_aviao (aeroporto_t* aeroporto, aviao_t* aviao) {
-    
+    printf("Aviao %d aguardando permissão para decolar\n",aviao->id);
+    inserir(aeroporto->fila_pista,aviao);
+    pthread_mutex_lock(&aviao->mutexAviao);
+    sem_wait(aeroporto->sem_pistas);
+    printf("Aviao %d decolando\n",aviao->id);
+    usleep(aeroporto->t_pouso_decolagem);
+    sem_post(aeroporto->sem_pistas);
+    free(aviao);
 }
 
 int finalizar_aeroporto (aeroporto_t* aeroporto) {

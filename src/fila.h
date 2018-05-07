@@ -26,6 +26,7 @@ void desaloca_elemento (elemento_t * elemento);
 typedef struct {
   elemento_t * primeiro;
   elemento_t * ultimo;
+  char* nome_fila;
   size_t n_elementos;
 } fila_ordenada_t;
 

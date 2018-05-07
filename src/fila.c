@@ -1,5 +1,6 @@
 #include "fila.h"
 #include <stdlib.h>
+#include   	<stdio.h>
 
 /**
  * fila.c
@@ -38,48 +39,53 @@ void desaloca_fila (fila_ordenada_t * fila) {
 }
 
 void inserir (fila_ordenada_t * fila, aviao_t * dado) {
-    elemento_t* elemento = aloca_elemento(dado);
-    elemento->dado = dado;
+    elemento_t* adicionado = aloca_elemento(dado);
+    adicionado->dado = dado;
     if (fila->n_elementos == 0)
-    {
-        elemento->proximo = elemento;
-        elemento->anterior = elemento;
-        pthread_mutex_unlock(&elemento->dado->mutexAviao); 
-        fila->primeiro = elemento;
-        fila->ultimo = elemento;
-        fila->n_elementos = 1;
+    {	
+    	fila->primeiro = adicionado;
+    	fila->ultimo = adicionado;
+    	fila->primeiro->proximo = NULL;
+    	fila->primeiro->anterior = NULL;
+    	pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
+    	fila->n_elementos = 1;
+    	printf("%s inserindo o primeiro %d \n",fila->nome_fila ,adicionado->dado->id);
     } else {
-    	if (dado->combustivel <= 10)
-    	{	
-            elemento->proximo = fila->ultimo;
-            elemento->anterior = fila->primeiro;
-            fila->primeiro->proximo = elemento;
-            fila->primeiro = elemento;
-    	} else {
-            elemento->proximo = fila->ultimo;
-            elemento->anterior = fila->primeiro;
-            fila->primeiro->proximo = elemento;
-            fila->ultimo->anterior = elemento;
-            fila->ultimo = elemento;
-    	}
-        fila->n_elementos++;
+    	adicionado->proximo = fila->ultimo;
+    	fila->ultimo->anterior = adicionado;
+    	fila->ultimo = adicionado;
+    	fila->n_elementos++;
+    	//printf("%s inserindo %d \n", fila->nome_fila, adicionado->dado->id);
+
     }
 }
 
 aviao_t * remover (fila_ordenada_t * fila) {
-    elemento_t* removido = fila-> primeiro;
-    if (removido->anterior == removido)
-    {
-    	fila->primeiro = NULL;
-    	fila->ultimo = NULL;
-    } else {
-    	
-        fila->primeiro = removido->anterior;
-        fila->primeiro->proximo = removido->proximo;
-        pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
+    if (fila->n_elementos == 0) {
+         printf("%s impossivel retirar, fila vazia",fila->nome_fila);
+         return NULL;
     }
-    fila->n_elementos--;
+   
+    elemento_t* removido = fila->primeiro;
+
+    if (fila->n_elementos == 1)
+    {	
+        fila->primeiro = NULL;
+        fila->ultimo = NULL;
+        fila->n_elementos = 0;
+    	printf("%s removendo unico %d \n", fila->nome_fila, removido->dado->id);
+
+    } else {
+    	fila->primeiro = removido->anterior;
+    	fila->primeiro->proximo = NULL;
+    	pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
+    	//fila->primeiro->mutexAviao
+        fila->n_elementos--;
+    	printf("%s removendo %d \n", fila->nome_fila, removido->dado->id );
+    }
+        
     aviao_t* aviao = removido->dado;
-    //free(remover);
+  
+    free(removido);
     return aviao;
 }
