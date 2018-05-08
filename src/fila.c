@@ -49,7 +49,7 @@ void inserir (fila_ordenada_t * fila, aviao_t * dado) {
     	fila->primeiro->anterior = NULL;
     	pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
     	fila->n_elementos = 1;
-    	printf("%s inserindo o primeiro %d \n",fila->nome_fila ,adicionado->dado->id);
+    	//printf("%s inserindo o primeiro %d \n",fila->nome_fila ,adicionado->dado->id);
     } else {
     	adicionado->proximo = fila->ultimo;
     	fila->ultimo->anterior = adicionado;
@@ -73,7 +73,7 @@ aviao_t * remover (fila_ordenada_t * fila) {
         fila->primeiro = NULL;
         fila->ultimo = NULL;
         fila->n_elementos = 0;
-    	printf("%s removendo unico %d \n", fila->nome_fila, removido->dado->id);
+    	//printf("%s removendo unico %d \n", fila->nome_fila, removido->dado->id);
 
     } else {
     	fila->primeiro = removido->anterior;
@@ -81,7 +81,7 @@ aviao_t * remover (fila_ordenada_t * fila) {
     	pthread_mutex_unlock(&fila->primeiro->dado->mutexAviao);
     	//fila->primeiro->mutexAviao
         fila->n_elementos--;
-    	printf("%s removendo %d \n", fila->nome_fila, removido->dado->id );
+    	//printf("%s removendo %d \n", fila->nome_fila, removido->dado->id );
     }
         
     aviao_t* aviao = removido->dado;

@@ -16,9 +16,10 @@ typedef struct {
     tempo_t t_remover_bagagens;
     tempo_t t_inserir_bagagens;
     tempo_t t_bagagens_esteira;
-    fila_ordenada_t* fila_pista;
+    fila_ordenada_t* fila_pouso;
     fila_ordenada_t* fila_portao;
     fila_ordenada_t* fila_esteira;
+    fila_ordenada_t* fila_decolagem;
     sem_t* sem_pistas;
     sem_t* sem_portoes;
     sem_t* sem_esteiras;

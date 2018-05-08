@@ -98,7 +98,8 @@ int main (int argc, char** argv) {
     int proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
     int chegadaAviao = 0;
     int idaviao = 0;
-    pthread_t* threads[TEMPO_SIMULACAO/NOVO_AVIAO_MIN];
+    int numero_max_threads = TEMPO_SIMULACAO/NOVO_AVIAO_MIN;
+    pthread_t* threads = malloc(sizeof(pthread_t)*numero_max_threads);
 
     for (int i = 0; i < TEMPO_SIMULACAO; ++i)
     {       
@@ -114,17 +115,19 @@ int main (int argc, char** argv) {
             params->aviao = novoAviao;
             params->aeroporto = meu_aeroporto;
             //pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
-            inserir(meu_aeroporto->fila_pista, novoAviao);
+            inserir(meu_aeroporto->fila_pouso, novoAviao);
             pthread_create(&novoAviao->thread, NULL, inicia_aproximacao, (void *)params);
             chegadaAviao = 0;
             proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
-            //threads[idaviao] = &novoAviao->thread;
+            threads[idaviao-1] = novoAviao->thread;
         }
         chegadaAviao++;
     }
-    printf("KARALHO: %lu\n", idaviao);
-    for(int i=0; i < idaviao-1; i++) {
-        pthread_join(*threads[i], NULL);
+
+    for(int i=0; i < idaviao; i++) {
+        //printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa%d \n",i);
+        pthread_join(threads[i], NULL);
+        //printf("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB%d \n",i+1);
     }
     return 1;
 }
