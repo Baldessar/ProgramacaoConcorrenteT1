@@ -23,6 +23,10 @@ typedef struct {
     sem_t* sem_pistas;
     sem_t* sem_portoes;
     sem_t* sem_esteiras;
+    pthread_mutex_t* mutexFilaPouso;
+    pthread_mutex_t* mutexFilaPortao;
+    pthread_mutex_t* mutexFilaEsteira;
+    pthread_mutex_t* mutexFilaDecolagem;
     // Adicionar aqui outros atributos que você achar necessários.
     // Exemplo: esteiras, portões, etc...
 } aeroporto_t;

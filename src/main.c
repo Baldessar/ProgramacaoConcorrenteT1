@@ -115,7 +115,9 @@ int main (int argc, char** argv) {
             params->aviao = novoAviao;
             params->aeroporto = meu_aeroporto;
             //pthread_create(novoAviao->thread, NULL, inicia_aproximacao, params);
+            pthread_mutex_lock(meu_aeroporto->mutexFilaPouso);
             inserir(meu_aeroporto->fila_pouso, novoAviao);
+            pthread_mutex_unlock(meu_aeroporto->mutexFilaPouso);
             pthread_create(&novoAviao->thread, NULL, inicia_aproximacao, (void *)params);
             chegadaAviao = 0;
             proxAviao = ((rand() % (NOVO_AVIAO_MAX- NOVO_AVIAO_MIN)) + NOVO_AVIAO_MIN);
